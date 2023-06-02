@@ -2,11 +2,12 @@ from itertools import combinations
 import random
 import matplotlib.pyplot as plt
 from UnionFind.QuickUnionFind import QuickUnionFind
+import copy
 
 random.seed(0)
 
 if __name__ == '__main__':
-    n = 10000  # 1000, 5000, 10000
+    n = 1000  # 1000, 5000, 10000
     delta = 50
     avg_tpl_nc, avg_tpu_nc, idx_nc = [], [], []
     avg_tpl_pc, avg_tpu_pc, idx_pc = [], [], []
@@ -31,21 +32,20 @@ if __name__ == '__main__':
             break
         if i % delta == 0:
             # Get average TPL and TPU after delta unions
-            sum_tpu, sum_tpl = 0, 0
+            sum_tpl, sum_tpu = 0, 0
             for j in range(n):
                 _, tpl, tpu = quf_nc.quick_find(j)
                 sum_tpu += tpu
                 sum_tpl += tpl
 
-            # print(sum_tpu / n, sum_tpl / n)
-            avg_tpl_nc.append(sum_tpl / n)
-            avg_tpu_nc.append(sum_tpu / n)
+            avg_tpl_nc.append(sum_tpl/n)
+            avg_tpu_nc.append(sum_tpu/n)
             idx_nc.append(i)
 
     # Do the same thing for full pc
     for i, pair in enumerate(comb):
         print(2, i)
-        quf_pc.quick_union(pair[0], pair[1])
+        quf_pc.quick_pc_union(pair[0], pair[1])
         if quf_pc.nr_blocks == 1:
             # Abort the queue once there is only one block left
             break
@@ -53,8 +53,10 @@ if __name__ == '__main__':
             # Get average TPL and TPU after delta unions
             sum_tpu, sum_tpl = 0, 0
             for j in range(n):
-                _, tpl, tpu = quf_pc.pc_find(j)
-                # print(tpl, tpu)
+                copy_quf_pc = copy.deepcopy(quf_pc)
+                # copy_quf_pc = QuickUnionFind(n)
+                # copy_quf_pc.data = quf_pc.data
+                _, tpl, tpu = copy_quf_pc.pc_find(j)
                 sum_tpu += tpu
                 sum_tpl += tpl
             # print(sum_tpu/n, sum_tpl/n)
@@ -65,7 +67,7 @@ if __name__ == '__main__':
     # Do the same thing for path splitting
     for i, pair in enumerate(comb):
         print(3, i)
-        quf_ps.quick_union(pair[0], pair[1])
+        quf_ps.quick_ps_union(pair[0], pair[1])
         if quf_ps.nr_blocks == 1:
             # Abort the queue once there is only one block left
             break
@@ -73,8 +75,11 @@ if __name__ == '__main__':
             # Get average TPL and TPU after delta unions
             sum_tpu, sum_tpl = 0, 0
             for j in range(n):
-                _, tpl, tpu = quf_ps.ps_find(j)
-                sum_tpu += tpu
+                copy_quf_ps = copy.deepcopy(quf_ps)
+                # copy_quf_ps = QuickUnionFind(n)
+                # copy_quf_ps.data = quf_ps.data
+                _, tpl, tpu = copy_quf_ps.pc_find(j)  # More or less the same as in pc
+                sum_tpu += tpu-1  # two pointer are not updated
                 sum_tpl += tpl
             # print(sum_tpu/n, sum_tpl/n)
             avg_tpl_ps.append(sum_tpl / n)
@@ -84,7 +89,7 @@ if __name__ == '__main__':
     # Do the same thing for path halving ph
     for i, pair in enumerate(comb):
         print(4, i)
-        quf_ph.quick_union(pair[0], pair[1])
+        quf_ph.quick_ph_union(pair[0], pair[1])
         if quf_ph.nr_blocks == 1:
             # Abort the queue once there is only one block left
             break
@@ -92,7 +97,10 @@ if __name__ == '__main__':
             # Get average TPL and TPU after delta unions
             sum_tpu, sum_tpl = 0, 0
             for j in range(n):
-                _, tpl, tpu = quf_ph.ph_find(j)
+                copy_quf_ph = copy.deepcopy(quf_ph)
+                # copy_quf_ph = QuickUnionFind(n)
+                # copy_quf_ph.data = quf_ph.data
+                _, tpl, tpu = copy_quf_ph.ph_find(j)
                 sum_tpu += tpu
                 sum_tpl += tpl
             # print(sum_tpu/n, sum_tpl/n)
