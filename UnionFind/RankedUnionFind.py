@@ -47,13 +47,47 @@ class RankedUnionFind:
         rj, _, _ = self.rank_find(j)
         if ri == rj:
             return
-        #print(ri, rj, self.data[ri], self.data[rj])
         if self.data[ri] >= self.data[rj]:
             self.data[rj] = min(self.data[rj], self.data[ri] - 1)
             self.data[ri] = rj
         else:
             self.data[rj] = ri
-        #print(ri,rj, self.data[ri],self.data[rj])
+        self.nr_blocks -= 1
+
+    def union_pc_by_rank(self, i, j):
+        ri, _, _ = self.pc_ranked_find(i)
+        rj, _, _ = self.pc_ranked_find(j)
+        if ri == rj:
+            return
+        if self.data[ri] >= self.data[rj]:
+            self.data[rj] = min(self.data[rj], self.data[ri] - 1)
+            self.data[ri] = rj
+        else:
+            self.data[rj] = ri
+        self.nr_blocks -= 1
+
+    def union_ps_by_rank(self, i, j):
+        ri, _, _ = self.ps_ranked_find(i)
+        rj, _, _ = self.ps_ranked_find(j)
+        if ri == rj:
+            return
+        if self.data[ri] >= self.data[rj]:
+            self.data[rj] = min(self.data[rj], self.data[ri] - 1)
+            self.data[ri] = rj
+        else:
+            self.data[rj] = ri
+        self.nr_blocks -= 1
+
+    def union_ph_by_rank(self, i, j):
+        ri, _, _ = self.ph_ranked_find(i)
+        rj, _, _ = self.ph_ranked_find(j)
+        if ri == rj:
+            return
+        if self.data[ri] >= self.data[rj]:
+            self.data[rj] = min(self.data[rj], self.data[ri] - 1)
+            self.data[ri] = rj
+        else:
+            self.data[rj] = ri
         self.nr_blocks -= 1
 
 
@@ -70,4 +104,3 @@ if __name__ == '__main__':
     print(rf.rank_find(4))
     print(rf.data)
     print(rf.nr_blocks)
-

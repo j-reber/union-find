@@ -3,11 +3,13 @@ import random
 import matplotlib.pyplot as plt
 from UnionFind.QuickUnionFind import QuickUnionFind
 import copy
+import numpy as np
 
 random.seed(0)
 
+
 if __name__ == '__main__':
-    n = 5000  # 1000, 5000, 10000
+    n = 1000  # 1000, 5000, 10000
     delta = 50
     avg_tpl_nc, avg_tpu_nc, idx_nc = [], [], []
     avg_tpl_pc, avg_tpu_pc, idx_pc = [], [], []
@@ -53,11 +55,12 @@ if __name__ == '__main__':
             # Get average TPL and TPU after delta unions
             sum_tpu, sum_tpl = 0, 0
             for j in range(n):
-                copy_quf_pc = copy.deepcopy(quf_pc)
-                # copy_quf_pc = QuickUnionFind(n)
-                # copy_quf_pc.data = quf_pc.data
-                _, tpl, tpu = copy_quf_pc.pc_find(j)
-                sum_tpu += tpu
+                # copy_quf_pc = copy.deepcopy(quf_pc)
+                # _, tpl, tpu = copy_quf_pc.pc_find(j)
+                _, tpl, _ = quf_pc.quick_find(j)
+                # all_children = quf_pc.get_all_children()
+                # r, tpl, _ = quf_pc.quick_find(j)
+                sum_tpu += tpl-1 if tpl > 0 else 0
                 sum_tpl += tpl
             # print(sum_tpu/n, sum_tpl/n)
             avg_tpl_pc.append(sum_tpl / n)
@@ -75,11 +78,12 @@ if __name__ == '__main__':
             # Get average TPL and TPU after delta unions
             sum_tpu, sum_tpl = 0, 0
             for j in range(n):
-                copy_quf_ps = copy.deepcopy(quf_ps)
-                # copy_quf_ps = QuickUnionFind(n)
-                # copy_quf_ps.data = quf_ps.data
-                _, tpl, tpu = copy_quf_ps.pc_find(j)  # More or less the same as in pc
-                sum_tpu += tpu-1  # two pointer are not updated
+                # copy_quf_ps = copy.deepcopy(quf_ps)
+                # _, tpl, tpu = copy_quf_ps.ps_find(j)  # More or less the same as in pc
+                _, tpl, _ = quf_ps.quick_find(j)
+                # all_children = quf_ps.get_all_children()
+
+                sum_tpu += tpl-1 if tpl > 0 else 0  # two pointer are not updated
                 sum_tpl += tpl
             # print(sum_tpu/n, sum_tpl/n)
             avg_tpl_ps.append(sum_tpl / n)
@@ -97,11 +101,8 @@ if __name__ == '__main__':
             # Get average TPL and TPU after delta unions
             sum_tpu, sum_tpl = 0, 0
             for j in range(n):
-                copy_quf_ph = copy.deepcopy(quf_ph)
-                # copy_quf_ph = QuickUnionFind(n)
-                # copy_quf_ph.data = quf_ph.data
-                _, tpl, tpu = copy_quf_ph.ph_find(j)
-                sum_tpu += tpu
+                _, tpl, _ = quf_ph.quick_find(j)
+                sum_tpu += tpl/2
                 sum_tpl += tpl
             # print(sum_tpu/n, sum_tpl/n)
 
@@ -144,5 +145,28 @@ if __name__ == '__main__':
     fig.suptitle(
         f'{n} sample with quick union and where the last pair processed at {idx_nc[-1]} with delta={delta}')
     plt.savefig(f'plots/quickunion_examples_{n}_evaluated_{delta}.png')
-
     # plt.show()
+    plt.close()
+
+    plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
+    avg_tpl_nc, avg_tpu_nc, idx_nc = np.array(avg_tpl_nc), np.array(avg_tpu_nc), np.array(idx_nc)
+    avg_tpl_pc, avg_tpu_pc, idx_pc = np.array(avg_tpl_pc), np.array(avg_tpu_pc), np.array(idx_pc)
+    avg_tpl_ps, avg_tpu_ps, idx_ps = np.array(avg_tpl_ps), np.array(avg_tpu_ps), np.array(idx_ps)
+    avg_tpl_ph, avg_tpu_ph, idx_ph = np.array(avg_tpl_ph), np.array(avg_tpu_ph), np.array(idx_ph)
+
+    plt.plot(idx_nc, avg_tpu_nc + avg_tpl_nc, label='Average cost with no compression')
+    plt.plot(idx_nc, avg_tpu_pc + avg_tpl_pc, label='Average cost with full compression')
+    plt.plot(idx_nc, avg_tpu_ps + avg_tpl_ps, label='Average cost with path splitting')
+    plt.plot(idx_nc, avg_tpu_ph + avg_tpl_ph, label='Average cost with path halving')
+
+    plt.xlabel('Pairs processed')
+    plt.ylabel('Total cost')
+    plt.title('Average cost of the heuristics calculated with TPL + TPU')
+    plt.legend()
+    plt.savefig(f'plots/quickunion_cost_evaluation_examples_{n}_evaluated_{delta}.png')
+
+
+
+
+
+

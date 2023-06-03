@@ -53,9 +53,52 @@ class WeightedUnionFind:
         if self.data[ri] >= self.data[rj]:
             self.data[rj] += self.data[ri]
             self.data[ri] = rj
-
         else:
             self.data[ri] += self.data[rj]
             self.data[rj] = ri
+        self.nr_blocks -= 1
 
+    def union_pc_by_weight(self, i, j):
+        ri, _, _ = self.pc_weighted_find(i)
+        rj, _, _ = self.pc_weighted_find(j)
+        # print(ri, rj, self.data[ri], self.data[rj])
+        # print(self.data)
+        if ri == rj:
+            return
+        if self.data[ri] >= self.data[rj]:
+            self.data[rj] += self.data[ri]
+            self.data[ri] = rj
+        else:
+            self.data[ri] += self.data[rj]
+            self.data[rj] = ri
+        self.nr_blocks -= 1
+
+    def union_ps_by_weight(self, i, j):
+        ri, _, _ = self.ps_weighted_find(i)
+        rj, _, _ = self.ps_weighted_find(j)
+        # print(ri, rj, self.data[ri], self.data[rj])
+        # print(self.data)
+        if ri == rj:
+            return
+        if self.data[ri] >= self.data[rj]:
+            self.data[rj] += self.data[ri]
+            self.data[ri] = rj
+        else:
+            self.data[ri] += self.data[rj]
+            self.data[rj] = ri
+        self.nr_blocks -= 1
+
+    def union_ph_by_weight(self, i, j):
+        ri, _, _ = self.ph_weighted_find(i)
+        rj, _, _ = self.ph_weighted_find(j)
+        # print(ri, rj, self.data[ri], self.data[rj])
+        # print(self.data)
+        if ri == rj:
+            return
+        if self.data[ri] >= self.data[rj]:
+            self.data[rj] += self.data[ri]
+            self.data[ri] = rj
+        else:
+            self.data[ri] += self.data[rj]
+            self.data[rj] = ri
         self.nr_blocks -= 1

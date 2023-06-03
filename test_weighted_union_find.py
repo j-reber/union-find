@@ -2,6 +2,7 @@ from itertools import combinations
 import random
 import matplotlib.pyplot as plt
 from UnionFind.WeightedUnionFind import WeightedUnionFind
+import numpy as np
 random.seed(0)
 
 if __name__ == '__main__':
@@ -43,7 +44,7 @@ if __name__ == '__main__':
     # Do the same thing for full pc
     for i, pair in enumerate(comb):
         print(2, i)
-        wuf_pc.union_by_weight(pair[0], pair[1])
+        wuf_pc.union_pc_by_weight(pair[0], pair[1])
         if wuf_pc.nr_blocks == 1:
             # Abort the queue once there is only one block left
             break
@@ -51,9 +52,9 @@ if __name__ == '__main__':
             # Get average TPL and TPU after delta unions
             sum_tpu, sum_tpl = 0, 0
             for j in range(n):
-                _, tpl, tpu = wuf_pc.pc_weighted_find(j)
+                _, tpl, _ = wuf_pc.weighted_find(j)
                 # print(tpl, tpu)
-                sum_tpu += tpu
+                sum_tpu += tpl-1 if tpl > 0 else 0
                 sum_tpl += tpl
             # print(sum_tpu/n, sum_tpl/n)
             avg_tpl_pc.append(sum_tpl / n)
@@ -63,7 +64,7 @@ if __name__ == '__main__':
     # Do the same thing for path splitting
     for i, pair in enumerate(comb):
         print(3, i)
-        wuf_ps.union_by_weight(pair[0], pair[1])
+        wuf_ps.union_ps_by_weight(pair[0], pair[1])
         if wuf_ps.nr_blocks == 1:
             # Abort the queue once there is only one block left
             break
@@ -71,8 +72,8 @@ if __name__ == '__main__':
             # Get average TPL and TPU after delta unions
             sum_tpu, sum_tpl = 0, 0
             for j in range(n):
-                _, tpl, tpu = wuf_ps.ps_weighted_find(j)
-                sum_tpu += tpu
+                _, tpl, _ = wuf_ps.weighted_find(j)
+                sum_tpu += tpl-1 if tpl > 0 else 0
                 sum_tpl += tpl
             # print(sum_tpu/n, sum_tpl/n)
             avg_tpl_ps.append(sum_tpl / n)
@@ -82,7 +83,7 @@ if __name__ == '__main__':
     # Do the same thing for path halving ph
     for i, pair in enumerate(comb):
         print(4, i)
-        wuf_ph.union_by_weight(pair[0], pair[1])
+        wuf_ph.union_ph_by_weight(pair[0], pair[1])
         if wuf_ph.nr_blocks == 1:
             # Abort the queue once there is only one block left
             break
@@ -90,8 +91,8 @@ if __name__ == '__main__':
             # Get average TPL and TPU after delta unions
             sum_tpu, sum_tpl = 0, 0
             for j in range(n):
-                _, tpl, tpu = wuf_ph.ph_weighted_find(j)
-                sum_tpu += tpu
+                _, tpl, _ = wuf_ph.weighted_find(j)
+                sum_tpu += tpl/2
                 sum_tpl += tpl
             # print(sum_tpu/n, sum_tpl/n)
 
@@ -134,5 +135,24 @@ if __name__ == '__main__':
     fig.suptitle(
         f'{n} sample with weighted union and where the last pair processed at {idx_nc[-1]} with delta={delta}')
     plt.savefig(f'plots/weightedunion_examples_{n}_evaluated_{delta}.png')
-
     # plt.show()
+
+    plt.close()
+
+    plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
+    avg_tpl_nc, avg_tpu_nc, idx_nc = np.array(avg_tpl_nc), np.array(avg_tpu_nc), np.array(idx_nc)
+    avg_tpl_pc, avg_tpu_pc, idx_pc = np.array(avg_tpl_pc), np.array(avg_tpu_pc), np.array(idx_pc)
+    avg_tpl_ps, avg_tpu_ps, idx_ps = np.array(avg_tpl_ps), np.array(avg_tpu_ps), np.array(idx_ps)
+    avg_tpl_ph, avg_tpu_ph, idx_ph = np.array(avg_tpl_ph), np.array(avg_tpu_ph), np.array(idx_ph)
+
+    plt.plot(idx_nc, avg_tpu_nc + avg_tpl_nc, label='Average cost with no compression')
+    plt.plot(idx_nc, avg_tpu_pc + avg_tpl_pc, label='Average cost with full compression')
+    plt.plot(idx_nc, avg_tpu_ps + avg_tpl_ps, label='Average cost with path splitting')
+    plt.plot(idx_nc, avg_tpu_ph + avg_tpl_ph, label='Average cost with path halving')
+
+    plt.xlabel('Pairs processed')
+    plt.ylabel('Total cost')
+    plt.title('Average cost of the heuristics calculated with TPL + TPU')
+    plt.legend()
+    plt.savefig(f'plots/weightedunion_cost_evaluation_examples_{n}_evaluated_{delta}.png')
+
