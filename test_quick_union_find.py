@@ -7,7 +7,7 @@ import copy
 random.seed(0)
 
 if __name__ == '__main__':
-    n = 1000  # 1000, 5000, 10000
+    n = 5000  # 1000, 5000, 10000
     delta = 50
     avg_tpl_nc, avg_tpu_nc, idx_nc = [], [], []
     avg_tpl_pc, avg_tpu_pc, idx_pc = [], [], []
